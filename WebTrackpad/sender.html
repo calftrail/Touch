@@ -1,0 +1,89 @@
+<html>
+	<head>
+		<!-- Written by Nathan Vander Wilt. © 2009 Calf Trail Software, LLC -->
+		<meta name="viewport" content="width=device-width; height=device-height;
+		initial-scale=1.0; maximum-scale=1.0; user-scalable=no;" />
+		<title>WebTrackpad</title>
+		
+		<script>
+			var pendingReq;
+			var bufferInfo;
+			function flushBuffer() {
+				if (pendingReq || !bufferInfo) { return; }
+				
+				var reqParams = "";
+				for (var prop in bufferInfo) {
+					if (reqParams.length) { reqParams += '&'; }
+					reqParams += prop + '=' + bufferInfo[prop];
+				}
+				bufferInfo = undefined;
+				
+				var req = new XMLHttpRequest();
+				req.open('POST', "/?" + reqParams);
+				req.onreadystatechange = function () {
+					if (this.readyState == 4) {
+						pendingReq = undefined;
+						flushBuffer();
+					}
+				}
+				req.send();
+				pendingReq = req;
+			}
+			
+			function sendEventInfo(eventInfo) {
+				if (bufferInfo) {
+					for (var prop in eventInfo) {
+						if (prop in bufferInfo)	{ bufferInfo[prop] += eventInfo[prop]; }
+						else { bufferInfo[prop] = eventInfo[prop]; }
+					}
+				}
+				else {
+					bufferInfo = eventInfo;
+				}
+				flushBuffer();
+			};
+			
+			var prevLoc;
+			function cursorMove(e) {
+				var loc = { 'x' : e.screenX, 'y' : e.screenY };
+				if (prevLoc) {
+					sendEventInfo({'dX' : (loc.x - prevLoc.x), 'dY' : (loc.y - prevLoc.y)});
+				}
+				prevLoc = loc;
+			}
+			
+			function mouseMove(e) {
+				e.preventDefault();
+				cursorMove(e);
+			}
+			function touchMove(e) {
+				if (e.touches.length == 1) {
+					e.preventDefault();
+					var touch =  e.touches[0];
+					cursorMove(touch);
+				}
+			}
+			
+			var prevGest;
+			function gestureChange(e) {
+				var gest = {"scale" : e.scale};
+				if (prevGest) {
+					sendEventInfo({'dScale' : (gest.scale - prevGest.scale)});
+				}
+				prevGest = gest;
+			}
+			
+			window.onload = function () {
+				document.body.addEventListener("mousemove", mouseMove, false);
+				document.body.addEventListener("mouseout", function () { prevLoc = undefined; }, false);
+				document.body.addEventListener("touchmove", touchMove, false);
+				document.body.addEventListener("touchend", function () { prevLoc = undefined; }, false);
+				document.body.addEventListener("gesturechange", gestureChange, false);
+				document.body.addEventListener("gestureend", function () { prevGest = undefined; }, false);
+			}
+			</script>
+	</head>
+	<body>
+		Move the mouse.
+	</body>
+</html>

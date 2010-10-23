@@ -1,0 +1,102 @@
+CGEvent wrapper is Big Endian
+
+  0 -unknown-	00 00 00 02 (version?)
+  4 -unknown-	00 01 40 35 <-- are these a header?! [count, type, field]
+  8 -unknown-	00 00 00 03
+ 12 -unknown-	00 01 40 36
+ 16 -unknown-	00 00 00 00
+ 20 -unknown-	00 01 40 37
+ 24 int32	type
+ 28 -unknown-	00 02 C0 38
+ 32 float32	location.x
+ 36 float32	location y
+ 40 -unknown-	00 02 C0 39
+ 44 -unknown-	00 00 00 00
+ 48 -unknown-	00 00 00 00
+ 52 -unknown-	00 01 00 3A
+ 56 uint32	timestamp LSB
+ 60 uint32	timestamp MSB
+ 64 -unknown-	00 01 40 3B
+ 68 uint32	flags
+ 72 -unknown-	00 01 40 33
+ 76 -unknown-	00 00 00 00
+ 80 -unknown-	00 01 40 34
+ 84 -unknown-	00 00 00 00
+ 88 -unknown-	00 01 40 6A
+ 92 -unknown-	00 00 00 00
+ 96 -unknown-	00 01 40 6B
+100 -unknown-	00 00 00 00
+104…	type-specific data (with headers!)
+
+
+Types
+00 - uint64 (LSB/MSB split)
+10 - uint8
+40 - int32
+C0 - float32
+
+Fields
+32 ( 50) 	unknown =240	(*only appears in live CGEvent)
+33 ( 51)	unknown =0
+34 ( 52)	unknown =0
+35 ( 53)	unknown =3
+36 ( 54)	unknown =0
+37 ( 55)	type
+38 ( 56)	location
+39 ( 57)	unknown =0f,0f
+3A ( 58)	timestamp
+3B ( 59)	flags =256
+65 (101)	unknown =4	(*only appears in live CGEvent)
+66 (102)	unknown =63	(*only appears in live CGEvent)
+6A (106)	unknown =0
+6B (107)	unknown =0
+
+6D (109)	gesture/IOHIDEvent data
+6E (110)	gesture subtype
+6F (111)	unknown	(00 00 00 00)
+70 (112)	unknown (00 00 00 00)
+71 (113)	magnification amount
+72 (114)	rotation amount
+73 (115)	swipe direction		(IOHIDSwipeMask)	0:(0,1) 2:(0,-1) 4:(1,0) 8:(-1,0)
+75 (117)	subtype of gesture beginning (0 at EndGesture)
+76 (118)	sub6 value 1
+77 (119)	sub6 value 2
+78 (120)	sub6 value 3 (00 00 00 00)
+
+Gesture subtypes
+05 ( 5)		Rotate
+06 ( 6)		??? "sub6" (scroll/pan?)
+08 ( 8)		Magnify
+0B (11)		Gesture
+10 (16)		Swipe
+3D (61)		BeginGesture
+3E (62)		EndGesture
+
+
+
+enum {
+    kIOHIDSwipeUp                             = 0x00000001,
+    kIOHIDSwipeDown                           = 0x00000002,
+    kIOHIDSwipeLeft                           = 0x00000004,
+    kIOHIDSwipeRight                          = 0x00000008,
+};
+typedef uint32_t IOHIDSwipeMask;
+
+duplicate fields 113, 114, 116, 118
+magnification	float		0.009995 -> 0.007996
+rotation	float		0.000000 -> -0.080432, 0.000000 -> 0.080432
+swipe		float		0.000000
+begin		float		0.000000
+sub6		int		12.000000 -> 13.000000
+
+
+duplicate fields 115, 117
+magnification	int		1008975872 -> 1006829568
+rotation	int		0 -> 3181689265, 0 -> 1034205617
+swipe		int	
+begin		int	new subtype
+sub6		int		1094713344.000000 -> 1095761920.000000
+
+field 119
+appears with w/subtype 6	3.000000 -> 2.000000
+

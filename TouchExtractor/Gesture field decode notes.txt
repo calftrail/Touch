@@ -1,0 +1,70 @@
+CG->NSEvent: type=Gesture loc=(438,410) time=877.6 flags=0x100 win=0x0 winNum=0 ctxt=0x0 subtype=b  {(
+    NSTouch: {id:0x13562b10[7]  phase:Moved loc:{0.397324, 0.544647} resting:NO},
+    NSTouch: {id:0x13564390[10] phase:Moved loc:{0.508591, 0.725113} resting:NO},
+    NSTouch: {id:0x13563450[11] phase:Moved loc:{0.353775, 0.293991} resting:NO}
+)}
+
+LITTLE ENDIAN!
+  0 uint64_t	88 40 3C 52 CC 00 00 00	-> 1B 27 B6 52 CC 00 00 00	timestamp
+  8 uint32_t	00 00 00 00
+ 12 uint32_t	00 00 00 00
+ 16 uint32_t	03 00 03 00						child options
+ 20 uint32_t	05 00 00 00						numChildren	5
+
+ 24 uint32_t	60 00 00 00					size			92
+ 28 uint32_t	0B 00 00 00					type (IOHIDEventType)	kIOHIDEventTypeDigitizer
+ 32 uint64_t	00 00 00 00 00 00 00 00				timestamp
+ 40 uint32_t	03 00 03 00					options			kIOHIDTransducerRange | kIOHIDTransducerTouch | kIOHIDDigitizerEventRange | kIOHIDDigitizerEventTouch
+ 44 IOFixed	7E 6B 00 00	->	91 5A 00 00		position.x		(27518 -> 23185)	(0.4198913574 -> 0.3537750244)
+ 48 IOFixed	8F 7A 00 00	->	AB B3 00 00		position.y		(31375 -> 45995)	(0.4787445068 -> 0.7018280029)
+ 52 IOFixed	00 00 00 00					position.z
+ 56 uint32_t	1C 00 40 00					transducerIndex		4194332
+ 60 uint32_t	23 00 00 00					transducerType		kIOHIDDigitizerTransducerTypeHand
+ 64 uint32_t	01 00 00 00					identity		1
+ 68 uint32_t	04 00 00 00					eventMask		kIOHIDDigitizerEventPosition
+ 72 uint32_t	04 00 00 00	->	06 00 00 00		buttonMask
+ 76 uint32_t	00 00 00 00
+...
+116 uint32_t	00 00 00 00
+
+32-	120 uint32_t	60 00 00 00				size			96
+28-	124 uint32_t	0B 00 00 00				type			kIOHIDEventTypeDigitizer
+24-	128 uint64_t	00 00 00 00 00 00 00 00			timestamp
+16-	136 uint32_t	01 00 03 00	->	01 00 01 00	options			kIOHIDTransducerRange | kIOHIDTransducerTouch | kIOHIDDigitizerEventRange
+12-	140 IOFixed	B7 65 00 00	->	C9 64 00 00	position.x		(26039 -> 25801)/65536=	(0.397324 -> 0.393692)
+ 8-	144 IOFixed	92 74		->	80 73 00 00	position.y					(0.544647 -> 0.548828)
+ 4-	148 IOFixed	00 00 00 00				position.z
+ 0	152 uint32_t	07 00 00 00				transducerIndex		7
+ 4	156 uint32_t	22 00 00 00				transducerType		kIOHIDDigitizerTransducerTypeFinger
+ 8	160 uint32_t	04 00 00 00				identity		4
+12	164 uint32_t	04 00 00 00	->	02 00 00 00	eventMask		(kIOHIDDigitizerEventPosition -> kIOHIDDigitizerEventTouch)
+16	168 uint32_t	00 00 00 00				childEventMask
+20	172 uint32_t	00 00 00 00				buttonMask
+24	176 IOFixed	00 00 00 00				tipPressure
+28	180 IOFixed	00 00 00 00				barrelPressure
+32	184 IOFixed	B8 75 A4 00	->	38 B9 A4 00	twist			(164.1226806641 -> 164.0814252479)
+36	188 uint32_t	02 00 00 00				orientationType		(quality)
+40	192 IOFixed	00 29 00 00	->	00 18 00 00	x/altitude/quality	(0.16015625 -> 0.09375)
+44	196 IOFixed	00 60 00 00	->	00 32 00 00	y/azimuth/density	(0.375 -> 0.1953125)
+48	200 IOFixed	00 00 00 00				//irregularity
+52	204 IOFixed	0A D7 09 00	->	00 00 0A 00	//majorRadius		(9.8399963379 -> 10)
+56	208 IOFixed	EB D1 05 00	->	A3 70 05 00	//minorRadius		(5.8378076405 -> 5.4399871826)
+
+	408 uint32_t	48 00 00 00				size			72
+	412 uint32_t	01 00 00 00				type			kIOHIDEventTypeVendorDefined
+	416 uint64_t	00 00 00 00 00 00 00 00			timestamp
+	424 uint32_t	00 00 00 00				options
+	428 uint16_t	00 FF					usagePage
+	430 uint16_t	77 17					usage
+	432 uint32_t	01 00 00 00				version			1
+	436 uint32_t	28 00 00 00				length			40
+	440 uint8[]	00 00 60 04 00 00 00 03			data
+	448 uint8[]	00 00 00 00 00 00 00 00			data
+...
+	472 uint8[]	00 00 00 00 00 00 00 00			data
+
+CG->NSEvent: type=Gesture loc=(438,410) time=877.6 flags=0x100 win=0x0 winNum=0 ctxt=0x0 subtype=b  {(
+    NSTouch: {id:0x13562b10[7]  phase:Ended loc:{0.393692, 0.548828} resting:NO},
+    NSTouch: {id:0x13564390[10] phase:Ended loc:{0.50618, 0.727631} resting:NO},
+    NSTouch: {id:0x13563450[11] phase:Moved loc:{0.353775, 0.298172} resting:NO}
+)}

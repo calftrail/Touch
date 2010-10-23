@@ -1,0 +1,7 @@
+//
+// Prefix header for all source files of the 'TouchSynthesis' target in the 'TouchSynthesis' project.
+//
+
+#ifdef __OBJC__
+    #import <Foundation/Foundation.h>
+#endif
