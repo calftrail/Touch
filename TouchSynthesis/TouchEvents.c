@@ -286,7 +286,7 @@ CGEventRef tl_CGEventCreateFromGesture(CFDictionaryRef info, CFArrayRef touches)
 	if (val) {
 		CFNumberGetValue(val, kCFNumberSInt64Type, &deviceID);
 	}
-	const UInt8 vendorPayload[40] = {};
+	UInt8 vendorPayload[40] = {};
 	*(uint64_t*)vendorPayload = CFSwapInt64HostToLittle(deviceID);
 	const size_t vendorPayloadLen = sizeof(vendorPayload);
 	const size_t vendorDataSize = sizeof(IOHIDVendorDefinedEventData) + vendorPayloadLen;

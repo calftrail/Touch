@@ -12,13 +12,13 @@
 
 /* these for info */
 
-const CFStringRef kTLInfoKeyDeviceID;	// required for touches
-const CFStringRef kTLInfoKeyTimestamp;
-const CFStringRef kTLInfoKeyGestureSubtype;
-const CFStringRef kTLInfoKeyMagnification;
-const CFStringRef kTLInfoKeyRotation;	// degrees
-const CFStringRef kTLInfoKeySwipeDirection;
-const CFStringRef kTLInfoKeyNextSubtype;
+extern const CFStringRef kTLInfoKeyDeviceID;	// required for touches
+extern const CFStringRef kTLInfoKeyTimestamp;
+extern const CFStringRef kTLInfoKeyGestureSubtype;
+extern const CFStringRef kTLInfoKeyMagnification;
+extern const CFStringRef kTLInfoKeyRotation;	// degrees
+extern const CFStringRef kTLInfoKeySwipeDirection;
+extern const CFStringRef kTLInfoKeyNextSubtype;
 
 enum {
 	kTLInfoSubtypeRotate = 0x05,
@@ -42,29 +42,29 @@ typedef uint32_t TLInfoSwipeDirection;
 
 /* these for touches */
 
-const CFStringRef kTLEventKeyType;
-const CFStringRef kTLEventKeyTimestamp;
-const CFStringRef kTLEventKeyOptions;
+extern const CFStringRef kTLEventKeyType;
+extern const CFStringRef kTLEventKeyTimestamp;
+extern const CFStringRef kTLEventKeyOptions;
 
-const CFStringRef kTLEventKeyPositionX;
-const CFStringRef kTLEventKeyPositionY;
-const CFStringRef kTLEventKeyPositionZ;
+extern const CFStringRef kTLEventKeyPositionX;
+extern const CFStringRef kTLEventKeyPositionY;
+extern const CFStringRef kTLEventKeyPositionZ;
 
-const CFStringRef kTLEventKeyTransducerIndex;
-const CFStringRef kTLEventKeyTransducerType;
-const CFStringRef kTLEventKeyIdentity;
-const CFStringRef kTLEventKeyEventMask;
+extern const CFStringRef kTLEventKeyTransducerIndex;
+extern const CFStringRef kTLEventKeyTransducerType;
+extern const CFStringRef kTLEventKeyIdentity;
+extern const CFStringRef kTLEventKeyEventMask;
 
-const CFStringRef kTLEventKeyButtonMask;
-const CFStringRef kTLEventKeyTipPressure;
-const CFStringRef kTLEventKeyBarrelPressure;
-const CFStringRef kTLEventKeyTwist;
+extern const CFStringRef kTLEventKeyButtonMask;
+extern const CFStringRef kTLEventKeyTipPressure;
+extern const CFStringRef kTLEventKeyBarrelPressure;
+extern const CFStringRef kTLEventKeyTwist;
 
-const CFStringRef kTLEventKeyQuality;
-const CFStringRef kTLEventKeyDensity;
-const CFStringRef kTLEventKeyIrregularity;
-const CFStringRef kTLEventKeyMajorRadius;
-const CFStringRef kTLEventKeyMinorRadius;
+extern const CFStringRef kTLEventKeyQuality;
+extern const CFStringRef kTLEventKeyDensity;
+extern const CFStringRef kTLEventKeyIrregularity;
+extern const CFStringRef kTLEventKeyMajorRadius;
+extern const CFStringRef kTLEventKeyMinorRadius;
 
 
 CGEventRef tl_CGEventCreateFromGesture(CFDictionaryRef info, CFArrayRef touches);
