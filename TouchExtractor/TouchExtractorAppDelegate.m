@@ -388,7 +388,7 @@ static IOFixed gPrevParentX = 0;
 		uint8_t field = *(bytes + offset);
 		offset += 1;
 		
-		printf("Field 0x%02x: ", field);
+		printf("Field 0x%02X: ", field);
 		switch (dataType) {
 			case 0x00:	// uint64_t
 				for (uint16_t i = 0; i < dataCount; ++i) {
@@ -464,7 +464,7 @@ printf("\n----\n\n");
 		printf("CG->%s ", [[event description] UTF8String]);
 		//printf("%lli ", CGEventGetIntegerValueField(e, 0x6D)); /* _mthid_copyDeviceInfo(xxx) failed */
 		NSSet* t = [event touchesMatchingPhase:NSTouchPhaseAny inView:nil];
-		printf(" %s\n\n", [[t description] UTF8String]);
+		printf(" touches: %s\n\n", [[t description] UTF8String]);
 		
 		CFRelease(e);
 	}
