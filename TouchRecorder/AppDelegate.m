@@ -131,7 +131,13 @@ static CGEventRef AnnotatedCB(CGEventTapProxy proxy, CGEventType type, CGEventRe
 
 - (void)logCGEvent:(CGEventRef)event tap:(NSString*)tapName {
 	//printf("%s - %s ", [tapName UTF8String], [[[NSEvent eventWithCGEvent:event] description] UTF8String]);
+//	NSLog(@"orig: %@", [[NSEvent eventWithCGEvent:event] touchesMatchingPhase:NSTouchPhaseAny inView:nil]);
 	CFDataRef eventData = CGEventCreateData(kCFAllocatorDefault, event);
+   
+//	CGEventRef event2 = CGEventCreateFromData(NULL, eventData);
+//	NSLog(@"data: %@", [[NSEvent eventWithCGEvent:event2] touchesMatchingPhase:NSTouchPhaseAny inView:nil]);
+//	CFRelease(event2);
+   
 	NSDictionary* eventRecord = [NSDictionary dictionaryWithObjectsAndKeys:
 								 (id)eventData, @"event", tapName, @"tap", nil];
 	CFRelease(eventData);
