@@ -114,7 +114,7 @@
 				}
 				
 				double val = CGEventGetDoubleValueField(e, field);
-				if ((field == 50 && val == 240.0) ||
+				if ((field == 50 && val == 248.0) ||
 					(field == 53 && val == 3.0) ||
 					(field == 59 && val == 256.0) ||
 					(field == 101 && val == 4.0) ||
@@ -128,7 +128,8 @@
 				if (val) {
 					if (hadPrevField) printf(", ");
 					else hadPrevField = true;
-					printf("%i - %f", field, val);
+					//printf("%i - %f", field, val);
+               printf("0x%02X - %f", field, val);
 				}
 			}
 			printf("\n");
@@ -157,7 +158,7 @@ static IOFixed gPrevParentX = 0;
 	IOHIDSystemQueueElement header = *(IOHIDSystemQueueElement*)(bytes + offset);
 	offset += sizeof(IOHIDSystemQueueElement);
 	
-	printf("IOHIDEvents @ %llu, options: 0x%08x ", header.timeStamp, header.options);
+   printf("IOHIDEvents @ %llu, options: 0x%08x ", header.timeStamp, header.options);
 	printf("{\n");
 	uint32_t parentOptions = 0;
 	uint32_t parentMask = 0;
@@ -172,6 +173,7 @@ static IOFixed gPrevParentX = 0;
 	IOFixed rangeChildAvgX = 0;
 	uint32_t otherChildCount = 0;
 	IOFixed otherChildAvgX = 0;
+   NSAssert(header.attributeLength == 0, @"New attributes field is not handled!");
 	for (uint32_t childIdx = 0; childIdx < header.eventCount; ++childIdx) {
 		NSAssert(offset + sizeof(IOHIDEventData) <= len, @"Data too short to contain child event data");
 		IOHIDEventData eventBase = *(IOHIDEventData*)(bytes + offset);
@@ -220,8 +222,8 @@ static IOFixed gPrevParentX = 0;
 			printf("  eventMask: 0x%08x, childEventMask: 0x%08x\n", digitizerEvent.eventMask, digitizerEvent.childEventMask);
 			printf("  buttonMask: 0x%08x, tipPressure: %f, barrelPressure: %f\n",
 				   digitizerEvent.buttonMask,
-				   tl_fixed2float(digitizerEvent.tipPressure),
-				   tl_fixed2float(digitizerEvent.barrelPressure));
+				   tl_fixed2float(digitizerEvent.pressure),
+				   tl_fixed2float(digitizerEvent.auxPressure));
 			printf("  twist: %f\n", tl_fixed2float(digitizerEvent.twist));
 			switch(digitizerEvent.orientationType) {
 				case 0:
@@ -248,7 +250,12 @@ static IOFixed gPrevParentX = 0;
 			printf(" }");
 		}
 		else if (eventBase.type == kIOHIDEventTypeOrientation ||
-				 eventBase.type == kIOHIDEventTypeScroll)
+				 eventBase.type == kIOHIDEventTypeScroll ||
+				 eventBase.type == kIOHIDEventTypeVelocity ||
+				 eventBase.type == kIOHIDEventTypeTranslation ||
+				 eventBase.type == kIOHIDEventTypeRotation ||
+				 eventBase.type == kIOHIDEventTypeScale
+				)
 		{
 			NSAssert(sizeof(IOHIDAxisEventData) <= eventBase.size, @"Event size not large enough for type");
 			IOHIDAxisEventData orientationEvent = *(IOHIDAxisEventData*)(bytes + offset);
@@ -259,6 +266,18 @@ static IOFixed gPrevParentX = 0;
 					break;
 				case kIOHIDEventTypeScroll:
 					eventType = "scroll";
+					break;
+				case kIOHIDEventTypeVelocity:
+					eventType = "velocity";
+					break;
+				case kIOHIDEventTypeTranslation:
+					eventType = "translation";
+					break;
+				case kIOHIDEventTypeRotation:
+					eventType = "rotation";
+					break;
+				case kIOHIDEventTypeScale:
+					eventType = "scale";
 					break;
 				default:
 					eventType = "unexpected axis";
@@ -278,17 +297,22 @@ static IOFixed gPrevParentX = 0;
 			childOptions |= kIOHIDTransducerRange | kIOHIDTransducerTouch | kIOHIDEventOptionIsAbsolute;
 			printf(" swipe event { options: 0x%08x, swipeMask: %i }", swipeEvent.options, swipeEvent.swipeMask);
 		}
+		else if (eventBase.type == kIOHIDEventTypeForce) {
+			//NSAssert(sizeof(IOHIDSwipeEventData) <= eventBase.size, @"Event size not large enough for type");
+			//IOHIDSwipeEventData swipeEvent = *(IOHIDSwipeEventData*)(bytes + offset);
+			printf(" force event { unknown structure, additional size = %lu }", eventBase.size - sizeof(eventBase));
+		}
 		else if (eventBase.type == kIOHIDEventTypeButton) {
 			NSAssert(sizeof(IOHIDButtonEventData) <= eventBase.size, @"Event size not large enough for type");
 			IOHIDButtonEventData buttonEvent = *(IOHIDButtonEventData*)(bytes + offset);
 			
 			printf(" button event: {\n");
 			printf("  options: 0x%08x\n", buttonEvent.options);
-			printf("  buttonMask: 0x%08x, pressure: %f, buttonNumber: %hhu, clickState: %hhu\n",
-				   buttonEvent.button.buttonMask,
-				   tl_fixed2float(buttonEvent.button.pressure),
-				   buttonEvent.button.buttonNumber,
-				   buttonEvent.button.clickState);
+			printf("  buttonMask: 0x%08x, pressure: %f, buttonNumber: %hhu, clickState: %u\n",
+				   buttonEvent.mask,
+				   tl_fixed2float(buttonEvent.pressure),
+				   buttonEvent.number,
+				   buttonEvent.state);
 			printf(" }");
 		}
 		else if (eventBase.type == kIOHIDEventTypeMouse) {
@@ -301,27 +325,25 @@ static IOFixed gPrevParentX = 0;
 				   tl_fixed2float(mouseEvent.position.x),
 				   tl_fixed2float(mouseEvent.position.y),
 				   tl_fixed2float(mouseEvent.position.z));
-			printf("  buttonMask: 0x%08x, pressure: %f, buttonNumber: %hhu, clickState: %hhu\n",
-				   mouseEvent.button.buttonMask,
-				   tl_fixed2float(mouseEvent.button.pressure),
-				   mouseEvent.button.buttonNumber,
-				   mouseEvent.button.clickState);
+			printf("  mask: 0x%08x\n", mouseEvent.button.mask);
 			printf(" }");
 		}
 		else if (eventBase.type == kIOHIDEventTypeVendorDefined) {
 			NSAssert(sizeof(IOHIDVendorDefinedEventData) <= eventBase.size, @"Event size not large enough for type");
 			IOHIDVendorDefinedEventData vendorBase = *(IOHIDVendorDefinedEventData*)(bytes + offset);
-			printf(" vendor defined: { options: 0x%08x, usagePage: 0x%04x, usage: 0x%04x}",
-				   vendorBase.options, vendorBase.usagePage, vendorBase.usage);
+			printf(" vendor defined: { options: 0x%08x, usagePage: 0x%04x, usage: 0x%04x, length: %u}",
+				   vendorBase.options, vendorBase.usagePage, vendorBase.usage, vendorBase.length);
 		}
 		else {
-			printf(" <unparsed type %i>", eventBase.type);
+			printf(" <unparsed type %u>", eventBase.type);
 		}
 		offset += eventBase.size;
 	}
 	printf("\n}");
 	
-	//NSAssert(parentMask == childMask, @"Incorrect assumption about parent/child eventMask relationship");
+	return;
+	
+	NSAssert(parentMask == childMask, @"Incorrect assumption about parent/child eventMask relationship");
 	//if (parentMask != childMask) printf("****No good assumption about parent/child eventMask relationship");
 	NSAssert(parentChildMask == childChildMask, @"Incorrect assumption about parent/child childEventMask relationship");
 	NSAssert(parentOptions == childOptions, @"Incorrect assumption about parent/child option relationship");
@@ -427,14 +449,15 @@ static IOFixed gPrevParentX = 0;
 - (void)dumpEvents2:(NSArray*)eventLog {
 	for (NSDictionary* eventInfo in eventLog) {
 		if ([eventInfo objectForKey:@"method"]) {
-			NSData* eventData = [eventInfo objectForKey:@"event"];
-			NSEvent* event = [NSKeyedUnarchiver unarchiveObjectWithData:eventData];
-			printf("*** %s (%s)\n\n\n", [[event description] UTF8String], [[eventInfo objectForKey:@"method"] UTF8String]);
+			//NSData* eventData = [eventInfo objectForKey:@"event"];
+			//NSEvent* event = [NSKeyedUnarchiver unarchiveObjectWithData:eventData];
+			//printf("*** %s (%s)\n\n\n", [[event description] UTF8String], [[eventInfo objectForKey:@"method"] UTF8String]);
 			continue;
 		}
 		else if (![[eventInfo objectForKey:@"tap"] isEqualToString:@"HID"]) continue;
 		
 		CFDataRef eventData = (CFDataRef)[eventInfo objectForKey:@"event"];
+printf("\n----\n\n");
 		[self explainEventData:eventData];
 		CGEventRef e = CGEventCreateFromData(kCFAllocatorDefault, eventData);
 		NSEvent* event = [NSEvent eventWithCGEvent:e];
@@ -491,7 +514,7 @@ static IOFixed gPrevParentX = 0;
 }
 
 - (void)filterEvents2:(NSArray*)eventLog {
-	int fd = open("/Users/nathan/Desktop/filtered event data.bin", O_WRONLY | O_CREAT | O_TRUNC);
+	int fd = open("/Users/natevw/Desktop/filtered event data.bin", O_WRONLY | O_CREAT | O_TRUNC);
 	NSAssert(fd >= 0, @"Couldn't open file");
 	
 	for (NSDictionary* eventInfo in eventLog) {
@@ -667,7 +690,7 @@ extern CGSEventRecord* CGEventRecordPointer(CGEventRef e);
 	//NSURL* logFile = [NSURL URLWithString:@"file://localhost/Users/nathan/Library/Mail%20Downloads/MacBookPro.xml"];
 	//NSURL* logFile = [NSURL fileURLWithPath:@"/Volumes/Calf Trail Development/Touch/Touch Data/MacBookPro cleaned.xml"];
 	//NSURL* logFile = [NSURL fileURLWithPath:@"/Volumes/Calf Trail Development/Touch/Touch Data/Alissa events cleaned.xml"];
-	NSURL* logFile = [NSURL fileURLWithPath:@"/Users/nathan/Desktop/TouchesDebugLog.xml"];
+	NSURL* logFile = [NSURL fileURLWithPath:@"/Users/natevw/Desktop/TouchesDebugLog.xml"];
 	
 	NSArray* eventLog = [NSArray arrayWithContentsOfURL:logFile];
 	NSAssert([eventLog count], @"No events from logFile");
