@@ -15,6 +15,7 @@
 extern const CFStringRef kTLInfoKeyDeviceID;	// required for touches
 extern const CFStringRef kTLInfoKeyTimestamp;
 extern const CFStringRef kTLInfoKeyGestureSubtype;
+extern const CFStringRef kTLInfoKeyGesturePhase;
 extern const CFStringRef kTLInfoKeyMagnification;
 extern const CFStringRef kTLInfoKeyRotation;	// degrees
 extern const CFStringRef kTLInfoKeySwipeDirection;

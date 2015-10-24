@@ -14,6 +14,7 @@
 const CFStringRef kTLInfoKeyDeviceID = CFSTR("deviceID");
 const CFStringRef kTLInfoKeyTimestamp = CFSTR("timestamp");
 const CFStringRef kTLInfoKeyGestureSubtype = CFSTR("gestureSubtype");
+const CFStringRef kTLInfoKeyGesturePhase = CFSTR("gesturePhase");
 const CFStringRef kTLInfoKeyMagnification = CFSTR("magnification");
 const CFStringRef kTLInfoKeyRotation = CFSTR("rotation");
 const CFStringRef kTLInfoKeySwipeDirection = CFSTR("swipeDirection");
@@ -349,6 +350,15 @@ CGEventRef tl_CGEventCreateFromGesture(CFDictionaryRef info, CFArrayRef touches)
 	appendIntegerField(gestureData, 0x6F, 0);	// magic
 	appendIntegerField(gestureData, 0x70, 0);	// magic
 	
+	int32_t gesturePhase = 0;      // c.f. IOHIDEventPhaseBits
+	val = CFDictionaryGetValue(info, kTLInfoKeyGesturePhase);
+	if (val) {
+		CFNumberGetValue(val, kCFNumberSInt32Type, &gesturePhase);
+	}
+	appendIntegerField(gestureData, 0x84, gesturePhase);
+	appendIntegerField(gestureData, 0x85, 0);	// magic?
+   
+   
 	if (gestureSubtype == kTLInfoSubtypeMagnify) {
 		Float32 magnification = 0.0f;
 		val = CFDictionaryGetValue(info, kTLInfoKeyMagnification);
@@ -383,6 +393,9 @@ CGEventRef tl_CGEventCreateFromGesture(CFDictionaryRef info, CFArrayRef touches)
 		}
 		appendIntegerField(gestureData, 0x75, nextSubtype);
 	}
+	
+	appendFloatField(gestureData, 0x8B, 0.0f);		// magic?
+	appendFloatField(gestureData, 0x8C, 0.0f);		// magic?
 	
 	CGEventRef synthEvent = CGEventCreateFromData(kCFAllocatorDefault, gestureData);
 	CFRelease(gestureData);
